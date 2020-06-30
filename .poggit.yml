@@ -6,10 +6,11 @@ projects:
     path: ""
     icon: "resources/PiggyCrates.gif"
     libs:
-      - src: ParoxityTeam/Commando/Commando
+      - src: DaPigGuy/Commando-4.0.0/Commando
         version: ^2.1.0
       - src: muqsit/InvMenu/InvMenu
         version: ^3.1
+        branch: 4.0
     lint:
       phpstan: false
 ...

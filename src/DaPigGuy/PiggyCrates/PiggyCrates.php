@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace DaPigGuy\PiggyCrates;
 
 use CortexPE\Commando\BaseCommand;
-use CortexPE\Commando\exception\HookAlreadyRegistered;
 use CortexPE\Commando\PacketHooker;
 use DaPigGuy\PiggyCrates\commands\CrateCommand;
 use DaPigGuy\PiggyCrates\commands\KeyAllCommand;
@@ -19,15 +18,14 @@ use DaPigGuy\PiggyCustomEnchants\CustomEnchantManager;
 use DaPigGuy\PiggyCustomEnchants\PiggyCustomEnchants;
 use Exception;
 use muqsit\invmenu\InvMenuHandler;
+use pocketmine\block\tile\TileFactory;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
-use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\nbt\JsonNbtParser;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\tile\Tile;
 use pocketmine\utils\Config;
-use ReflectionException;
 
 class PiggyCrates extends PluginBase
 {
@@ -42,10 +40,6 @@ class PiggyCrates extends PluginBase
     /** @var array */
     public $crateCreation;
 
-    /**
-     * @throws ReflectionException
-     * @throws HookAlreadyRegistered
-     */
     public function onEnable(): void
     {
         foreach (
@@ -67,7 +61,7 @@ class PiggyCrates extends PluginBase
 
         self::$instance = $this;
 
-        Tile::registerTile(CrateTile::class);
+        TileFactory::getInstance()->register(CrateTile::class);
 
         $this->saveResource("crates.yml");
         $this->saveResource("messages.yml");
@@ -78,7 +72,7 @@ class PiggyCrates extends PluginBase
         $types = ["item", "command"];
         foreach ($crateConfig->get("crates") as $crateName => $crateData) {
             $this->crates[$crateName] = new Crate($this, $crateName, $crateData["floating-text"] ?? "", array_map(function (array $itemData) use ($crateName, $types): CrateItem {
-                $tags = "";
+                $tags = null;
                 if (isset($itemData["nbt"])) {
                     try {
                         $tags = JsonNbtParser::parseJson($itemData["nbt"]) ?? "";
@@ -86,7 +80,7 @@ class PiggyCrates extends PluginBase
                         $this->getLogger()->warning("Invalid crate item NBT supplied in crate type " . $crateName . ".");
                     }
                 }
-                $item = Item::get($itemData["id"], $itemData["meta"], $itemData["amount"], $tags);
+                $item = ItemFactory::getInstance()->get($itemData["id"], $itemData["meta"], $itemData["amount"], $tags);
                 if (isset($itemData["name"])) $item->setCustomName($itemData["name"]);
                 if (isset($itemData["lore"])) $item->setLore(explode("\n", $itemData["lore"]));
                 if (isset($itemData["enchantments"])) foreach ($itemData["enchantments"] as $enchantmentData) {
@@ -94,7 +88,7 @@ class PiggyCrates extends PluginBase
                         $this->getLogger()->error("Invalid enchantment configuration used in crate " . $crateName);
                         continue;
                     }
-                    $enchantment = Enchantment::getEnchantmentByName($enchantmentData["name"]) ?? ((($plugin = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants")) instanceof PiggyCustomEnchants && $plugin->isEnabled()) ? CustomEnchantManager::getEnchantmentByName($enchantmentData["name"]) : null);
+                    $enchantment = Enchantment::fromString($enchantmentData["name"]) ?? ((($plugin = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants")) instanceof PiggyCustomEnchants && $plugin->isEnabled()) ? CustomEnchantManager::getEnchantmentByName($enchantmentData["name"]) : null);
                     if ($enchantment !== null) $item->addEnchantment(new EnchantmentInstance($enchantment, $enchantmentData["level"]));
                 }
                 $itemData["type"] = $itemData["type"] ?? "item";

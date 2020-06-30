@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace DaPigGuy\PiggyCrates\tasks;
 
+use DaPigGuy\PiggyCrates\tiles\CrateTile;
 use DaPigGuy\PiggyCrates\crates\Crate;
 use DaPigGuy\PiggyCrates\crates\CrateItem;
 use DaPigGuy\PiggyCrates\PiggyCrates;
-use DaPigGuy\PiggyCrates\tiles\CrateTile;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\SharedInvMenu;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat;
 
@@ -53,7 +53,7 @@ class RouletteTask extends Task
         $this->tile = $tile;
 
         $this->menu = InvMenu::create(InvMenu::TYPE_CHEST);
-        $this->menu->getInventory()->setContents([4 => ($endRod = ItemFactory::get(ItemIds::END_ROD)->setCustomName(TextFormat::ITALIC)), 22 => $endRod]);
+        $this->menu->getInventory()->setContents([4 => ($endRod = ItemFactory::getInstance()->get(ItemIds::END_ROD)->setCustomName(TextFormat::ITALIC)), 22 => $endRod]);
         $this->menu->setInventoryCloseListener(function (Player $player): void {
             if ($this->itemsLeft > 0) $this->menu->send($player);
         });
@@ -63,7 +63,7 @@ class RouletteTask extends Task
         $this->itemsLeft = $crate->getDropCount();
     }
 
-    public function onRun(int $currentTick): void
+    public function onRun(): void
     {
         if (!$this->player->isOnline()) {
             $this->tile->closeCrate();
@@ -83,13 +83,13 @@ class RouletteTask extends Task
                 $reward = $this->lastRewards[floor(self::INVENTORY_ROW_COUNT / 2)];
                 if ($reward->getType() === "item") $this->player->getInventory()->addItem($reward->getItem());
                 foreach ($reward->getCommands() as $command) {
-                    $this->player->getServer()->dispatchCommand(new ConsoleCommandSender(), str_replace("{PLAYER}", $this->player->getName(), $command));
+                    $this->player->getServer()->dispatchCommand(new ConsoleCommandSender($this->player->getServer()), str_replace("{PLAYER}", $this->player->getName(), $command));
                 }
                 if ($this->itemsLeft === 0) {
                     foreach ($this->crate->getCommands() as $command) {
-                        $this->player->getServer()->dispatchCommand(new ConsoleCommandSender(), str_replace("{PLAYER}", $this->player->getName(), $command));
+                        $this->player->getServer()->dispatchCommand(new ConsoleCommandSender($this->player->getServer()), str_replace("{PLAYER}", $this->player->getName(), $command));
                     }
-                    $this->player->removeWindow($this->menu->getInventory());
+                    //$this->player->removeCurrentWindow();
                     $this->tile->closeCrate();
                     if (($handler = $this->getHandler()) !== null) $handler->cancel();
                 } else {

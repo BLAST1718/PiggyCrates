@@ -17,12 +17,12 @@ jobs:
       - name: wget virions, Commando
         uses: wei/wget@v1
         with:
-          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/89644/Commando_dev-13.phar
+          args: -O vendor/Commando.phar https://poggit.pmmp.io/r/90966/Commando_dev-2.phar
       - name: wget virions, InvMenu
         uses: wei/wget@v1
         with:
-          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/75631/InvMenu_dev-85.phar
+          args: -O vendor/InvMenu.phar https://poggit.pmmp.io/r/94265/InvMenu_dev-101.phar
       - name: Run PHPStan
-        uses: nxtlvlsoftware/pmmp-phpstan-action@3
+        uses: nxtlvlsoftware/pmmp-phpstan-action@4
         with:
           phpstan-config: phpstan.neon.dist
