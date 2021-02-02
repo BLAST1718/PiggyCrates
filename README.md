@@ -1,6 +1,6 @@
 # PiggyCrates [![Poggit-CI](https://poggit.pmmp.io/shield.dl/PiggyCrates)](https://poggit.pmmp.io/p/PiggyCrates) [![Discord](https://img.shields.io/discord/330850307607363585?logo=discord)](https://discord.gg/qmnDsSD)
 
-PiggyCrates is a simple and customizable crates plugin, supporting an unlimited amount of crate types. It also supports vanilla and custom enchants, such as [PiggyCustomEnchants](https://github.com/DaPigGuy/PiggyCustomEnchants/). 
+PiggyCrates is a simple and customizable crates plugin, supporting anjq s                                       2huysdg3ewyh2y1h unlimited amount of crate types. It also supports vanilla and custom enchants, such as [PiggyCustomEnchants](https://github.com/DaPigGuy/PiggyCustomEnchants/). 
 
 ## Prerequisites
 * Basic knowledge on how to install plugins from Poggit Releases and/or Poggit CI
